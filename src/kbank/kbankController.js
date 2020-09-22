@@ -10,6 +10,11 @@ const getRates = catchAsync(async (req, res, next) => {
       "https://kasikornbank.com/en/rate/Pages/Foreign-Exchange.aspx"
     );
     const $ = cheerio.load(result, { ignoreWhitespace: true });
+    
+    const dataDate = $('#divLastRate').attr('data-date').trimEnd();
+    const dataTime = $('#divLastRate').attr('data-time').trimEnd();
+    const dataRound = $('#divLastRate').attr('data-round').trimEnd();
+
     let rates = [];
     $("#divLastRate > .itemsRate").each((i, elem) => {
       $(elem).each((n, obj) => {
@@ -33,7 +38,12 @@ const getRates = catchAsync(async (req, res, next) => {
         });
       });
     });
-    sendResponse(res, rates);
+    sendResponse(res, {
+      dataDate,
+      dataTime,
+      dataRound,
+      rates
+    });
   } catch (error) {
     return next(new AppError("INTERNAL_ERROR", error.message));
   }
